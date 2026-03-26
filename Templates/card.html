@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Michael Reyes</title>
+  <style>
+    :root { --bg: #0a0a0a; --text: #f4f4f4; --muted: #b8b8b8; --panel: rgba(30,30,30,.8); --accent: #c0c0c0; }
+    .light-theme { --bg: #fdfdfd; --text: #111111; --muted: #444444; --panel: rgba(255,255,255,.85); --accent: #888888; }
+    body { font-family: Georgia, serif; margin: 0; padding: 0; background: var(--bg); color: var(--text); transition: background-color 0.35s ease, color 0.35s ease; }
+    .header { text-align: center; padding: 18px 0; background: var(--panel); backdrop-filter: blur(9px); }
+    .nav { display: flex; flex-direction: column; align-items: center; gap: 10px; font-size: 1.1rem; }
+    .nav a { text-decoration: none; color: var(--text); border-bottom: 1px solid transparent; padding-bottom: 2px; transition: border-color .25s, color .25s; }
+    .nav a:hover { color: var(--accent); border-color: var(--accent); }
+    .page-wrap { max-width: 980px; margin: 0 auto; padding: 30px 16px; background: var(--panel); border: 1px solid rgba(200,200,200,.18); border-radius: 14px; box-shadow: 0 20px 45px rgba(0,0,0,.25); }
+    .portrait { text-align: center; }
+    .portrait img { width: 220px; height: 220px; object-fit: cover; border-radius: 50%; box-shadow: 0 12px 20px rgba(0,0,0,.45); }
+    .about-title { margin-top: 18px; font-weight: bold; font-size: 1.35rem; color: var(--accent); }
+    .about-text { margin-top: 14px; font-size: 1rem; line-height: 1.7; color: var(--text); text-align: left; margin-bottom: 12px; }
+    .about-text:last-child { margin-bottom: 0; }
+    .photo-viewer { margin-top: 24px; text-align: center; }
+    .photo-viewer img { width: 100%; max-width: 700px; height: 420px; object-fit: cover; border-radius: 12px; border: 1px solid rgba(255,255,255,.25); box-shadow: 0 8px 18px rgba(0,0,0,.35); }
+    .photo-controls { margin-top: 10px; display: flex; justify-content: center; gap: 10px; }
+    .photo-controls button { border: 1px solid rgba(200,200,200,.45); background: rgba(30,30,30,.7); color: var(--text); border-radius: 8px; padding: 8px 14px; cursor: pointer; }
+    .photo-controls button:hover { background: rgba(60,60,60,.8); }
+    .footer { font-size: 0.95rem; padding: 16px; color: var(--muted); }
+    .footer a { text-decoration: none; margin-right: 12px; color: var(--muted); }
+    .theme-switch { position: absolute; right: 20px; top: 18px; background: rgba(255,255,255,.15); color: var(--text); border: 1px solid rgba(255,255,255,.25); border-radius: 999px; padding: 6px 12px; cursor: pointer; font-family: Georgia, serif; }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <button class="theme-switch" id="theme-switch">Dark / Light</button>
+    <nav class="nav">
+      <a href="/">Michael Reyes</a>
+    </nav>
+  </header>
+
+  <main class="page-wrap">
+    <section class="portrait">
+      <img src="{{ portrait_url }}" alt="Michael Reyes Portrait" onerror="this.src='/static/portrait.jpg'; this.onerror=null;" id="portraitImg">
+      <h2 class="about-title">Hello my name is Michael Reyes, this is a little about me</h2>
+      {% for paragraph in about_bio %}
+      <p class="about-text">{{ paragraph }}</p>
+      {% endfor %}
+    </section>
+
+    <section class="photo-viewer">
+      <img id="activeImage" src="{{ gallery_ids[0] }}" alt="Gallery image">
+      <div class="photo-controls">
+        <button id="prevBtn">Back</button>
+        <button id="nextBtn">Next</button>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <a href="https://www.linkedin.com/in/michaelreyes-profile" target="_blank">LinkedIn</a>
+    <a href="https://github.com/yahnmaicosreyes-cpu" target="_blank">GitHub</a>
+  </footer>
+
+  <script>
+    const btn = document.getElementById('theme-switch');
+    btn.addEventListener('click', () => {
+      document.documentElement.classList.toggle('light-theme');
+      const isLight = document.documentElement.classList.contains('light-theme');
+      btn.textContent = isLight ? 'Light' : 'Dark';
+    });
+
+    const gallery = [{% for img_id in gallery_ids %}'{{ img_id }}'{% if not loop.last %}, {% endif %}{% endfor %}];
+    const activeImage = document.getElementById('activeImage');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    let currentIndex = 0;
+
+    function updateImage() {
+      activeImage.src = gallery[currentIndex];
+    }
+
+    prevBtn.addEventListener('click', () => {
+      currentIndex = (currentIndex - 1 + gallery.length) % gallery.length;
+      updateImage();
+    });
+
+    nextBtn.addEventListener('click', () => {
+      currentIndex = (currentIndex + 1) % gallery.length;
+      updateImage();
+    });
+  </script>
+</body>
+</html>
